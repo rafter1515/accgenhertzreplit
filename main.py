@@ -3,7 +3,7 @@ import base64
 from hashlib import sha1
 import os
 import secmail
-
+from time import sleep
 def generate_device_Id():
     devicee = requests.get("https://ed-generators.herokuapp.com/device")
     return devicee.text
@@ -15,7 +15,7 @@ import wget
 import requests
 import heroku3
 from new import sid, emaill, passwordd, custompwd, chatlink, private, key, app_name, deviceid, nickname, replit
-
+from bs4 import BeautifulSoup
 
 def restart():
     heroku_conn = heroku3.from_key(key)
@@ -52,6 +52,26 @@ def gen_email():
     email = mail.generate_email()
     return email
 
+def get_message(email):
+    url="0"
+    try:
+        sleep(3)
+        f=email
+        mail = secmail.SecMail()
+        inbox = mail.get_messages(f)
+        print('done')
+        for Id in inbox.id:
+          msg = mail.read_message(email=f, id=Id).htmlBody
+          bs = BeautifulSoup(msg, 'html.parser')
+          images = bs.find_all('a')[0]
+          url = (images['href']+'\n')
+          if url is not None:
+            print('Vrification Url\n')
+            print(url)
+    except:
+        pass
+    return url
+
 password = custompwd
 # client.devicee()
 de = generate_device_Id()
@@ -64,8 +84,9 @@ for _ in range(3):
     dev = client.device_id
     email = gen_email()
     print(email)
-    client.request_verify_code(email=email, dev=dev)
-    link = client.get_message(email)
+    client.request_verify_code(email=email)
+    link = get_message(email)
+
     wget.download(url=link, out="code.png")
     with open("code.png", "rb") as file:
         sub.send_message(chatId=chatId, fileType="image", file=file)
@@ -94,10 +115,10 @@ for _ in range(2):
     except:
         pass
     dev = client.device_id
-    email = client.gen_email()
+    email = gen_email()
     print(email)
-    client.request_verify_code(email=email, dev=dev)
-    link = client.get_message(email)
+    client.request_verify_code(email=email)
+    link = get_message(email)
     wget.download(url=link, out="code.png")
     with open("code.png", "rb") as file:
         sub.send_message(chatId=chatId, fileType="image", file=file)
