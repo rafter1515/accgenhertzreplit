@@ -2,7 +2,7 @@ import hmac
 import base64
 from hashlib import sha1
 import os
-
+import secmail
 
 def generate_device_Id():
     devicee = requests.get("https://ed-generators.herokuapp.com/device")
@@ -47,6 +47,10 @@ def find():
             break
     return g
 
+def gen_email():
+    mail = secmail.SecMail()
+    email = mail.generate_email()
+    return email
 
 password = custompwd
 # client.devicee()
@@ -58,7 +62,7 @@ for _ in range(3):
     except:
         pass
     dev = client.device_id
-    email = client.gen_email()
+    email = gen_email()
     print(email)
     client.request_verify_code(email=email, dev=dev)
     link = client.get_message(email)
